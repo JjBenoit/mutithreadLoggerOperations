@@ -14,7 +14,7 @@ public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto,Ope
 
 		System.out.println("New Periode");
 
-		for (StatisticsDto<OperationDto,OperationStatisticsDto> operationDto : infos.values()) {
+		for (StatisticsDto<OperationDto> operationDto : infos.values()) {
 
 				System.out.println(operationDto.print());
 

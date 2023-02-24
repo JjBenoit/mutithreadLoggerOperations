@@ -8,7 +8,7 @@ import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDtoFactory;
 import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 
-public class AsynchronousStatLogger<D extends DataDto, S extends  StatisticsDto<D, S> > {
+public class AsynchronousStatLogger<D extends DataDto, S extends  StatisticsDto<D> > {
 
 	private final AsynchronousStatEngine<D, S> asynchronousStatEngine ;
 

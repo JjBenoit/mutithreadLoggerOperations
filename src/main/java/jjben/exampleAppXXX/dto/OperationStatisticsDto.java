@@ -2,7 +2,7 @@ package jjben.exampleAppXXX.dto;
 
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 
-public class OperationStatisticsDto extends StatisticsDto<OperationDto,OperationStatisticsDto> {
+public class OperationStatisticsDto extends StatisticsDto<OperationDto> {
 
 	private String name;
 	private long count;
@@ -22,13 +22,6 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 		this.count++;
 		this.timeTaken+=operation.timeTaken;
 		nbOK += operation.ok ? 1:0;
-	}
-	@Override
-	public void mergeStats(OperationStatisticsDto operations)
-	{
-		this.count+=operations.count;
-		this.timeTaken+=operations.timeTaken;
-		nbOK += operations.nbOK;
 	}
 
 

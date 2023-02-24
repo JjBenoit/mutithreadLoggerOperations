@@ -12,7 +12,7 @@ import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDtoFactory;
 import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 
-public class AsynchronousStatEngine<D extends DataDto, S extends  StatisticsDto<D, S> > {
+public class AsynchronousStatEngine<D extends DataDto, S extends  StatisticsDto<D> > {
 
 	private static final Logger LOGGER = Logger.getLogger(AsynchronousStatEngine.class.getName());
 	

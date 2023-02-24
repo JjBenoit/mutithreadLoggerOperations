@@ -1,6 +1,6 @@
-package jjben.dto;
+package jjben.exampleAppXXX.dto;
 
-import jjben.dto.interfaces.StatisticsDto;
+import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 
 public class OperationStatisticsDto extends StatisticsDto<OperationDto,OperationStatisticsDto> {
 
@@ -8,7 +8,7 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 	private long count;
 	private long timeTaken;
 	private long nbOK;
-	
+
 	public OperationStatisticsDto(String name) {
 
 		super(name);
@@ -22,7 +22,7 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 		this.timeTaken+=operation.timeTaken;
 		nbOK += operation.ok ? 1:0;
 	}
-	
+
 	public void mergeStats(OperationStatisticsDto operations)
 	{
 		this.count+=operations.count;
@@ -35,7 +35,7 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 		return timeTaken/count;
 	}
 
-	
+
 	private long getNbKo() {
 		return count-nbOK;
 	}

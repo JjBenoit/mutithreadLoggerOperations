@@ -1,8 +1,8 @@
-package jjben.dto;
+package jjben.exampleAppXXX.dto;
 
 import java.util.UUID;
 
-import jjben.dto.interfaces.DataDto;
+import jjben.asynchstatlogger.fwk.dto.DataDto;
 
 public class OperationDto implements DataDto {
 
@@ -10,7 +10,7 @@ public class OperationDto implements DataDto {
 	public String name;
 	public long timeTaken;
 	boolean ok;
-	
+
 	public OperationDto(String name, boolean ok, long timeTaken)
 	{
 		this.name = name;
@@ -29,8 +29,8 @@ public class OperationDto implements DataDto {
 		// TODO Auto-generated method stub
 		return name;
 	}
-	
 
-	
-	
+
+
+
 }

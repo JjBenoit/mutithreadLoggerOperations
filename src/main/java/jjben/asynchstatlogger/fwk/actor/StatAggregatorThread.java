@@ -53,13 +53,13 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 
 		LOGGER.log(Level.FINEST, "Begining to flush and write aggregating datas");
 
-		LOGGER.log(Level.FINEST, "notify consummers threads to send theirs datas");
+		LOGGER.log(Level.FINEST, "Notify consummers threads : claim theirs datas");
 		notifyAnwWaitNewLogs();
 
 		LOGGER.log(Level.FINEST, "Datas from consummers threads received");
 		Map<String,S> logsConsolided =  consolidationLogs();
 
-		LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be write and flush");
+		LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
 
 		aggregatorWriter.write(logsConsolided);
 

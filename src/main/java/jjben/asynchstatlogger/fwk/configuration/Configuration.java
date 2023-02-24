@@ -6,11 +6,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jjben.asynchstatlogger.fwk.actor.AsynchronousStatEngine;
-
 public class Configuration {
 
-	private static final Logger LOGGER = Logger.getLogger(AsynchronousStatEngine.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 
 	private Properties config;
 	

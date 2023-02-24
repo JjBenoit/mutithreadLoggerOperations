@@ -6,8 +6,7 @@ import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 
 @FunctionalInterface
-public interface AggregatorWriter<D extends DataDto, S extends  StatisticsDto<D> > {
+public interface AggregatorWriter<D extends DataDto> {
 
-	public void write(Map<String,S> infos);
-
+	public void write(Map<String,StatisticsDto<D>> infos);
 }

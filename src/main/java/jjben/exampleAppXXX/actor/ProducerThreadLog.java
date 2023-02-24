@@ -2,14 +2,13 @@ package jjben.exampleAppXXX.actor;
 
 import jjben.asynchstatlogger.fwk.share.AsynchronousStatLogger;
 import jjben.exampleAppXXX.dto.OperationDto;
-import jjben.exampleAppXXX.dto.OperationStatisticsDto;
 
 public class ProducerThreadLog implements Runnable {
 
-	private final AsynchronousStatLogger<OperationDto,OperationStatisticsDto> logQueue;
+	private final AsynchronousStatLogger<OperationDto> logQueue;
 
 
-	public ProducerThreadLog(AsynchronousStatLogger<OperationDto,OperationStatisticsDto> logQueue) {
+	public ProducerThreadLog(AsynchronousStatLogger<OperationDto> logQueue) {
 		super();
 		this.logQueue = logQueue;
 	}

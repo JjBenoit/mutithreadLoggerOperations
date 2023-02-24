@@ -17,13 +17,12 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto> {
 	}
 	
 	@Override
-	public void addData(OperationDto operation)
+	public void addData(OperationDto operation) 
 	{
 		this.count++;
 		this.timeTaken+=operation.timeTaken;
 		nbOK += operation.ok ? 1:0;
 	}
-
 
 	private long getMoyenne() {
 		return timeTaken/count;
@@ -45,6 +44,10 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto> {
 		return "OperationStatisticsDto [name=" + name + ", count=" + count + ", timeTaken=" + timeTaken + ", nbOK="
 				+ nbOK + ", getMoyenne()=" + getMoyenne() + ", getNbKo()=" + getNbKo() + "]";
 	}
+
+	
+
+	
 
 
 

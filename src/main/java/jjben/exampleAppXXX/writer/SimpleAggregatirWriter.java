@@ -5,12 +5,11 @@ import java.util.Map;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 import jjben.exampleAppXXX.dto.OperationDto;
-import jjben.exampleAppXXX.dto.OperationStatisticsDto;
 
-public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto,OperationStatisticsDto>
+public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto>
 {
-
-	public void write(Map<String,OperationStatisticsDto> infos) {
+	@Override
+	public void write(Map<String,StatisticsDto<OperationDto>> infos) {
 
 		System.out.println("New Periode");
 

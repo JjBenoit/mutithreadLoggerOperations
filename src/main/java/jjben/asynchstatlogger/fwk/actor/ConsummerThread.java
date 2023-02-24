@@ -9,18 +9,18 @@ import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 
 
-public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D> > implements Runnable{
+public class ConsummerThread<D extends DataDto> implements Runnable{
 
 	private static final Logger LOGGER = Logger.getLogger(ConsummerThread.class.getName());
 
-	private final AsynchronousStatEngine<D,S> engine;
+	private final AsynchronousStatEngine<D> engine;
 	
-	private Map<String, S> localRepo;
+	private Map<String, StatisticsDto<D>> localRepo;
 	
 	private boolean mustRefreshStatRepoRef;
 
 
-	public ConsummerThread(AsynchronousStatEngine<D,S> engine) {
+	public ConsummerThread(AsynchronousStatEngine<D> engine) {
 		
 		this.engine=engine;
 		this.engine.getStatAggregator().register(this);
@@ -37,12 +37,12 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D> > im
 			D statDto = engine.getQueue().poll();
 			if(statDto!=null)
 			{
-				S statisticsDto = engine.getStatAggregator().getAggregationLogs().get(statDto.getKey());
+				StatisticsDto<D> statisticsDto = localRepo.get(statDto.getKey());
 				if(statisticsDto == null)
 				{
 					statisticsDto = engine.getFactory().make(statDto.getKey());
-					engine.getStatAggregator().getAggregationLogs().putIfAbsent(statDto.getKey(), statisticsDto);
-					statisticsDto = engine.getStatAggregator().getAggregationLogs().get(statDto.getKey());
+					localRepo.putIfAbsent(statDto.getKey(), statisticsDto);
+					statisticsDto = localRepo.get(statDto.getKey());
 				}
 				
 				synchronized (statisticsDto) {
@@ -51,8 +51,8 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D> > im
 
 				if(mustRefreshStatRepoRef)
 				{
-					mustRefreshStatRepoRef = false;
 					this.localRepo = engine.getStatAggregator().getAggregationLogs();
+					mustRefreshStatRepoRef = false;
 					LOGGER.log(Level.FINEST, "Changed Ref sended to Agregator from "+Thread.currentThread().getName());
 				}
 			}

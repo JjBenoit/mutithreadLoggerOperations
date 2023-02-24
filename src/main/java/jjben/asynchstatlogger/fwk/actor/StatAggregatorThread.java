@@ -48,6 +48,7 @@ public class StatAggregatorThread<D extends DataDto> implements Runnable {
 		LOGGER.log(Level.FINEST, "Begining to flush and write aggregating datas");
 
 		LOGGER.log(Level.FINEST, "Notify consummers threads : claim theirs datas");
+		
 		notifyAnwWaitNewLogs();
 
 		LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
@@ -77,7 +78,7 @@ public class StatAggregatorThread<D extends DataDto> implements Runnable {
 		{
 			allThreadHaveSwitchedToNewRepo =true ;
 			
-			for (ConsummerThread consummerThread : consummerThreads) {
+			for (ConsummerThread<D> consummerThread : consummerThreads) {
 				
 				if(consummerThread.isMustRefreshStatRepoRef())
 					allThreadHaveSwitchedToNewRepo=false;

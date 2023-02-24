@@ -1,16 +1,15 @@
 package jjben.exampleAppXXX.actor;
 
-import jjben.asynchstatlogger.fwk.dto.DataDto;
-import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 import jjben.asynchstatlogger.fwk.share.AsynchronousStatLogger;
 import jjben.exampleAppXXX.dto.OperationDto;
+import jjben.exampleAppXXX.dto.OperationStatisticsDto;
 
-public class ProducerThreadLog<D extends DataDto, S extends  StatisticsDto<D, S> > implements Runnable {
+public class ProducerThreadLog implements Runnable {
 
-	private final AsynchronousStatLogger<D, S> logQueue;
+	private final AsynchronousStatLogger<OperationDto,OperationStatisticsDto> logQueue;
 
 
-	public ProducerThreadLog(AsynchronousStatLogger<D, S> logQueue) {
+	public ProducerThreadLog(AsynchronousStatLogger<OperationDto,OperationStatisticsDto> logQueue) {
 		super();
 		this.logQueue = logQueue;
 	}
@@ -31,7 +30,7 @@ public class ProducerThreadLog<D extends DataDto, S extends  StatisticsDto<D, S>
 			long fin =System.currentTimeMillis();
 
 
-			D operationLog = (D) new OperationDto(Thread.currentThread().getName(), true, fin-deb);
+			OperationDto operationLog = new OperationDto(Thread.currentThread().getName(), true, fin-deb);
 			logQueue.log(operationLog);
 
 

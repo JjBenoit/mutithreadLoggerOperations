@@ -2,7 +2,9 @@ package jjben.dto;
 
 import java.util.UUID;
 
-public class OperationDto {
+import jjben.dto.interfaces.DataDto;
+
+public class OperationDto implements DataDto {
 
 	public UUID uid;
 	public String name;
@@ -20,6 +22,12 @@ public class OperationDto {
 	@Override
 	public String toString() {
 		return "OperationDto [uid=" + uid + ", name=" + name + ", timeTaken=" + timeTaken + ", ok=" + ok + "]";
+	}
+
+	@Override
+	public String getKey() {
+		// TODO Auto-generated method stub
+		return name;
 	}
 	
 

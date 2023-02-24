@@ -1,6 +1,8 @@
 package jjben.dto;
 
-public class OperationStatisticsDto {
+import jjben.dto.interfaces.StatisticsDto;
+
+public class OperationStatisticsDto extends StatisticsDto<OperationDto,OperationStatisticsDto> {
 
 	private String name;
 	private long count;
@@ -9,18 +11,19 @@ public class OperationStatisticsDto {
 	
 	public OperationStatisticsDto(String name) {
 
-		this.name = name;
+		super(name);
+		this.name=name;
 
 	}
 
-	public void addInfos(OperationDto operation)
+	public void addData(OperationDto operation)
 	{
 		this.count++;
 		this.timeTaken+=operation.timeTaken;
 		nbOK += operation.ok ? 1:0;
 	}
 	
-	public void mergeStatsInfos(OperationStatisticsDto operations)
+	public void mergeStats(OperationStatisticsDto operations)
 	{
 		this.count+=operations.count;
 		this.timeTaken+=operations.timeTaken;
@@ -43,6 +46,7 @@ public class OperationStatisticsDto {
 				+ nbOK + ", getMoyenne()=" + getMoyenne() + ", getNbKo()=" + getNbKo() + "]";
 	}
 
-	
-	
+
+
+
 }

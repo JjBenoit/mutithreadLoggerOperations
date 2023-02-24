@@ -1,5 +1,7 @@
 package jjben.exampleAppXXX;
 
+import java.io.IOException;
+
 import jjben.asynchstatlogger.fwk.share.AsynchronousStatLogger;
 import jjben.exampleAppXXX.actor.ProducerThreadLog;
 import jjben.exampleAppXXX.dto.OperationDto;
@@ -11,21 +13,21 @@ public class Launcher {
 
 
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 
 		Launcher launcher = new Launcher();
-		launcher.start(10,1,10);
+		launcher.start();
 	}
 
 
-	public void start(int nbThreadProducer, int nbThreadConsummer,int aggragationPeriodictyInSeconds) throws InterruptedException {
+	public void start() throws InterruptedException, IOException {
 
 		AsynchronousStatLogger<OperationDto, OperationStatisticsDto> queue = new AsynchronousStatLogger<OperationDto, OperationStatisticsDto>
-		(nbThreadConsummer,aggragationPeriodictyInSeconds, new SimpleAggregatirWriter(),new OperationStatisticsDtoFactory());
+		( new SimpleAggregatirWriter(),new OperationStatisticsDtoFactory());
 
 		queue.startLogger();
 
-		for (int i = 0; i < nbThreadProducer; i++) {
+		for (int i = 0; i < 100; i++) {
 			  new Thread(new ProducerThreadLog(queue), "ProducerThreadLog "+i).start();
 		 }
 

@@ -15,14 +15,15 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 		this.name=name;
 
 	}
-
+	
+	@Override
 	public void addData(OperationDto operation)
 	{
 		this.count++;
 		this.timeTaken+=operation.timeTaken;
 		nbOK += operation.ok ? 1:0;
 	}
-
+	@Override
 	public void mergeStats(OperationStatisticsDto operations)
 	{
 		this.count+=operations.count;
@@ -40,6 +41,12 @@ public class OperationStatisticsDto extends StatisticsDto<OperationDto,Operation
 		return count-nbOK;
 	}
 
+	
+	@Override
+	public String print() {
+		return this.toString();
+	}
+	
 	@Override
 	public String toString() {
 		return "OperationStatisticsDto [name=" + name + ", count=" + count + ", timeTaken=" + timeTaken + ", nbOK="

@@ -16,7 +16,7 @@ public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto,Ope
 
 		for (StatisticsDto<OperationDto,OperationStatisticsDto> operationDto : infos.values()) {
 
-				System.out.println(operationDto.toString());
+				System.out.println(operationDto.print());
 
 			}
 

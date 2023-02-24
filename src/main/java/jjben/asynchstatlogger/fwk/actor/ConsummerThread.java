@@ -1,34 +1,30 @@
 package jjben.asynchstatlogger.fwk.actor;
 
 
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
-import jjben.asynchstatlogger.fwk.dto.StatisticsDtoFactory;
 
 
 public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D, S> > implements Runnable{
 
 	private static final Logger LOGGER = Logger.getLogger(ConsummerThread.class.getName());
 
-	private final Queue<D> queue;
-	private final StatAggregatorThread<D,S> collector;
-	private ConcurrentHashMap<String,S> statisticsRepository;
-	private StatisticsDtoFactory<D, S> factory;
 
+	private ConcurrentHashMap<String,S> statisticsRepository;
+	private final AsynchronousStatEngine<D,S> engine;
+	
 	private boolean logsAskedFromAgregator;
 
 
-	public ConsummerThread(Queue<D> queue,StatAggregatorThread<D,S> collector, StatisticsDtoFactory<D, S> factory) {
-		this.queue = queue;
+	public ConsummerThread(AsynchronousStatEngine<D,S> engine) {
+		
 		this.statisticsRepository = new ConcurrentHashMap<>();
-		this.collector=collector;
-		this.factory=factory;
-		collector.register(this);
+		this.engine=engine;
+		engine.getStatAggregator().register(this);
  	}
 
 
@@ -38,13 +34,13 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D, S> >
 
 		while(!Thread.currentThread().isInterrupted()) {
 
-			D statDto = queue.poll();
+			D statDto = engine.getQueue().poll();
 			if(statDto!=null)
 			{
 				S statisticsDto = statisticsRepository.get(statDto.getKey());
 				if(statisticsDto == null)
 				{
-					statisticsDto = factory.make(statDto.getKey());
+					statisticsDto = engine.getFactory().make(statDto.getKey());
 					statisticsRepository.put(statDto.getKey(), statisticsDto);
 				}
 
@@ -54,7 +50,7 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D, S> >
 				{
 					logsAskedFromAgregator = false;
 
-					collector.receiveStats(statisticsRepository);
+				    engine.getStatAggregator().receiveStats(statisticsRepository);
 					LOGGER.log(Level.FINEST, "logs sended to Agregator from "+Thread.currentThread().getName());
 
 					this.statisticsRepository = new ConcurrentHashMap<>();
@@ -66,7 +62,7 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D, S> >
 
 		}
 
-		collector.unregister(this);
+		engine.getStatAggregator().unregister(this);
 
 	}
 

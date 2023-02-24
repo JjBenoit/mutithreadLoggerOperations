@@ -15,6 +15,9 @@ public abstract class StatisticsDto<D extends DataDto, S extends  StatisticsDto<
 	public abstract void addData(D data);
 
 	public abstract void mergeStats(S statistics);
+	
+	public abstract String print();
+
 
 
 

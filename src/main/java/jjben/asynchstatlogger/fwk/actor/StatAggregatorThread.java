@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
-import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 
 
 
@@ -20,13 +19,11 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 
 	private List<ConsummerThread<D,S>> consummerThreads;
 	private List<Map<String,S>> aggregationLogs;
-	private int aggragationPeriodictyInSeconds;
-	private AggregatorWriter<D,S> aggregatorWriter;
+	private AsynchronousStatEngine<D,S> engine;
 
-	public StatAggregatorThread(int aggragationPeriodictyInSeconds, AggregatorWriter<D,S> aggregatorWriter) {
-		this.aggragationPeriodictyInSeconds =  aggragationPeriodictyInSeconds;
+	public StatAggregatorThread(AsynchronousStatEngine<D,S> engine) {
 		this.consummerThreads = new ArrayList<>();
-		this.aggregatorWriter = aggregatorWriter;
+		this.engine = engine;
 	}
 
 
@@ -47,8 +44,9 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 	@Override
 	public void run() {
 
+				
 		while (!Thread.currentThread().isInterrupted()) {
-
+		
 		waitForNextPeriod();
 
 		LOGGER.log(Level.FINEST, "Begining to flush and write aggregating datas");
@@ -61,7 +59,7 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 
 		LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
 
-		aggregatorWriter.write(logsConsolided);
+		engine.getAggregatorWriter().write(logsConsolided);
 
 
 		}
@@ -117,7 +115,7 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 	private void waitForNextPeriod()
 	{
 		try {
-			Thread.sleep(1000*aggragationPeriodictyInSeconds);
+			Thread.sleep(1000* engine.getConfig().getAggragationPeriodictyInSeconds());
 		} catch (InterruptedException e) {
 			//Do nothing
 		}

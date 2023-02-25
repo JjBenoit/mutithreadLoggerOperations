@@ -34,7 +34,9 @@ public class ConsummerThread<D extends DataDto, S extends  StatisticsDto<D, S> >
 
 		while(!Thread.currentThread().isInterrupted()) {
 
+			// NO wait here ,  important coz logsAskedFromAgregator have to be evaluated regulary 
 			D statDto = engine.getQueue().poll();
+			
 			if(statDto!=null)
 			{
 				S statisticsDto = statisticsRepository.get(statDto.getKey());

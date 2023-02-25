@@ -102,7 +102,11 @@ public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D,
 			thread.ask4NewLogs();
 		}
 
-		while(aggregationLogs.size()<consummerThreads.size())
+		long start = System.currentTimeMillis();
+		long end = start + 60 * 1000;
+		
+		// wait untill all responses have been receçved , or time out 
+		while(aggregationLogs.size() < consummerThreads.size() && System.currentTimeMillis() < end )
 		{
 			try {
 				Thread.sleep(100);

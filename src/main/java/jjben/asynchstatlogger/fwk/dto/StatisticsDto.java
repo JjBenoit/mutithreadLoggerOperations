@@ -1,23 +1,19 @@
 package jjben.asynchstatlogger.fwk.dto;
 
-public abstract class StatisticsDto<D extends DataDto>  {
+public abstract class StatisticsDto<D extends DataDto> {
 
-	private String key;
+    private String key;
 
-	public StatisticsDto(String key) {
-		this.key = key;
-	}
+    public StatisticsDto(String key) {
+	this.key = key;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+	return key;
+    }
 
-	public abstract void addData(D data);
+    public abstract void addData(D data);
 
-	public abstract String print();
-
-
-
-
+    public abstract String print();
 
 }

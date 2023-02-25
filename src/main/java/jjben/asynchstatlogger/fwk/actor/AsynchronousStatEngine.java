@@ -13,118 +13,112 @@ import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 
 public class AsynchronousStatEngine<D extends DataDto> {
 
-	private static final Logger LOGGER = Logger.getLogger(AsynchronousStatEngine.class.getName());
-	
-	private final Configuration config;
+    private static final Logger LOGGER = Logger.getLogger(AsynchronousStatEngine.class.getName());
 
-	private final ConcurrentLinkedDeque<D> queue;
+    private final Configuration config;
 
-	private StatAggregatorThread<D> statAggregator;
-	
-	private AggregatorWriter<D> aggregatorWriter;
+    private final ConcurrentLinkedDeque<D> queue;
 
-	private StatisticsDtoFactory<D> factory;
+    private StatAggregatorThread<D> statAggregator;
 
-	private final List<Thread> threads;
+    private AggregatorWriter<D> aggregatorWriter;
 
-	private State state;
-	
-	private enum State{
+    private StatisticsDtoFactory<D> factory;
 
-		NOT_INILIAZIED, RUNNING, STOPPED,
+    private final List<Thread> threads;
+
+    private State state;
+
+    private enum State {
+
+	NOT_INILIAZIED, RUNNING, STOPPED,
+    }
+
+    public AsynchronousStatEngine(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
+
+	this.config = new Configuration("configuration.properties");
+	this.aggregatorWriter = aggregatorWriter;
+	this.statAggregator = new StatAggregatorThread<D>(this);
+	this.queue = new ConcurrentLinkedDeque<>();
+	this.threads = new ArrayList<>();
+	this.factory = factory;
+	this.state = State.NOT_INILIAZIED;
+    }
+
+    private void init() throws IOException {
+
+	this.config.initConfig();
+
+	for (int i = 0; i < config.getNbThreadConsummer(); i++) {
+	    threads.add(new Thread(new ConsummerThread<D>(this), "ConsummerStatThread " + i));
 	}
 
+	threads.add(new Thread(statAggregator));
 
-	public AsynchronousStatEngine(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
+    }
 
-		this.config= new Configuration("configuration.properties");
-		this.aggregatorWriter= aggregatorWriter;
-		this.statAggregator = new StatAggregatorThread<D>(this);
-		this.queue = new ConcurrentLinkedDeque<>();
-		this.threads = new ArrayList<>();
-		this.factory= factory;
-		this.state= State.NOT_INILIAZIED;
+    public void log(D statDto) {
+
+	if (state != State.RUNNING)
+	    throw new IllegalStateException("AsynchronousStatLogger must be started before logging");
+
+	boolean successPush = queue.offer(statDto);
+
+	// log pour connaitre les echecs en cours de fort débit
+	if (!successPush)
+	    LOGGER.info(Thread.currentThread().getName() + " Queue full log opearation " + statDto);
+    }
+
+    public void startLogger() throws IOException {
+
+	if (state == State.STOPPED)
+	    throw new IllegalStateException("AsynchronousStatLogger can not be start after being stopped");
+
+	init();
+
+	for (Thread thread : threads) {
+	    thread.start();
 	}
 
-	private void init() throws IOException  {
-		
-		this.config.initConfig();
+	state = State.RUNNING;
+    }
 
-		 for (int i = 0; i < config.getNbThreadConsummer(); i++) {
-			 threads.add( new Thread(new ConsummerThread<D>(this),"ConsummerStatThread "+i));
-		 }
+    public void stopLogger() {
 
-		 threads.add(new Thread(statAggregator));
+	if (state != State.RUNNING)
+	    throw new IllegalStateException(
+		    "AsynchronousStatLogger can not be stoped, if it is already stopped or not initialized");
 
+	state = State.STOPPED;
+
+	for (Thread thread : threads) {
+	    thread.interrupt();
 	}
 
+    }
 
-	public  void log(D statDto) {
+    public Configuration getConfig() {
+	return config;
+    }
 
-		if(state!=State.RUNNING)
-			throw new IllegalStateException("AsynchronousStatLogger must be started before logging");
+    public ConcurrentLinkedDeque<D> getQueue() {
+	return queue;
+    }
 
-		boolean successPush = queue.offer(statDto);
+    public StatAggregatorThread<D> getStatAggregator() {
+	return statAggregator;
+    }
 
-		//log pour connaitre les echecs en cours de fort débit
-		if(!successPush)
-			LOGGER.info(Thread.currentThread().getName()+" Queue full log opearation "+statDto);
-	}
+    public AggregatorWriter<D> getAggregatorWriter() {
+	return aggregatorWriter;
+    }
 
+    public StatisticsDtoFactory<D> getFactory() {
+	return factory;
+    }
 
-
-	public void startLogger() throws IOException  {
-
-		if(state==State.STOPPED)
-			throw new IllegalStateException("AsynchronousStatLogger can not be start after being stopped");
-
-		init() ;
-
-		for (Thread thread : threads) {
-			thread.start();
-		}
-
-		state= State.RUNNING;
-	}
-
-	public void stopLogger()  {
-
-		if(state!=State.RUNNING)
-			throw new IllegalStateException("AsynchronousStatLogger can not be stoped, if it is already stopped or not initialized");
-
-		state= State.STOPPED;
-
-		for (Thread thread : threads) {
-			thread.interrupt();
-		}
-
-	}
-	
-
-	public Configuration getConfig() {
-		return config;
-	}
-
-	public ConcurrentLinkedDeque<D> getQueue() {
-		return queue;
-	}
-
-	public StatAggregatorThread<D> getStatAggregator() {
-		return statAggregator;
-	}
-
-	public AggregatorWriter<D> getAggregatorWriter() {
-		return aggregatorWriter;
-	}
-
-	public StatisticsDtoFactory<D>  getFactory() {
-		return factory;
-	}
-
-	public State getState() {
-		return state;
-	}
-	
-	
+    public State getState() {
+	return state;
+    }
 
 }

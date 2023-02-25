@@ -9,27 +9,24 @@ import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 
 public class AsynchronousStatLogger<D extends DataDto> {
 
-	private final AsynchronousStatEngine<D> asynchronousStatEngine ;
+    private final AsynchronousStatEngine<D> asynchronousStatEngine;
 
+    public AsynchronousStatLogger(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
 
-	public AsynchronousStatLogger(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
-		
-		asynchronousStatEngine = new AsynchronousStatEngine<D>(aggregatorWriter, factory);
-	}
+	asynchronousStatEngine = new AsynchronousStatEngine<D>(aggregatorWriter, factory);
+    }
 
+    public void log(D statDto) {
+	asynchronousStatEngine.log(statDto);
+    }
 
-	public void log(D statDto) {
-		asynchronousStatEngine.log(statDto);
-	}
-	public void startLogger() throws IOException  {
-		
-		asynchronousStatEngine.startLogger();
-	}
+    public void startLogger() throws IOException {
 
-	public void stopLogger()  {
-		asynchronousStatEngine.stopLogger();
-	}
+	asynchronousStatEngine.startLogger();
+    }
 
-
+    public void stopLogger() {
+	asynchronousStatEngine.stopLogger();
+    }
 
 }

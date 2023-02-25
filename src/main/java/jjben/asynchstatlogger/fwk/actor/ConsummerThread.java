@@ -13,7 +13,6 @@ public class ConsummerThread<D extends DataDto, S extends StatisticsDto<D, S>> i
 
     private ConcurrentHashMap<String, S> statisticsRepository;
     private final AsynchronousStatEngine<D, S> engine;
-
     private boolean logsAskedFromAgregator;
 
     public ConsummerThread(AsynchronousStatEngine<D, S> engine) {
@@ -42,16 +41,17 @@ public class ConsummerThread<D extends DataDto, S extends StatisticsDto<D, S>> i
 		statisticsDto.addData(statDto);
 
 	    }
-	}
-	if (logsAskedFromAgregator) {
-	    logsAskedFromAgregator = false;
 
-	    engine.getStatAggregator().receiveStats(statisticsRepository);
-	    LOGGER.log(Level.FINEST, "logs sended to Agregator from " + Thread.currentThread().getName());
+	    if (logsAskedFromAgregator) {
+		logsAskedFromAgregator = false;
 
-	    this.statisticsRepository = new ConcurrentHashMap<>();
-	    LOGGER.log(Level.FINEST, "new map created by " + Thread.currentThread().getName());
+		engine.getStatAggregator().receiveStats(statisticsRepository);
+		LOGGER.log(Level.FINEST, "logs sended to Agregator from " + Thread.currentThread().getName());
 
+		this.statisticsRepository = new ConcurrentHashMap<>();
+		LOGGER.log(Level.FINEST, "new map created by " + Thread.currentThread().getName());
+
+	    }
 	}
 
 	engine.getStatAggregator().unregister(this);

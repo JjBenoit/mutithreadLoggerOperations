@@ -11,31 +11,23 @@ import jjben.exampleAppXXX.writer.SimpleAggregatirWriter;
 
 public class Launcher {
 
+    public static void main(String[] args) throws InterruptedException, IOException {
 
+	Launcher launcher = new Launcher();
+	launcher.start();
+    }
 
-	public static void main(String[] args) throws InterruptedException, IOException {
+    public void start() throws InterruptedException, IOException {
 
-		Launcher launcher = new Launcher();
-		launcher.start();
+	AsynchronousStatLogger<OperationDto, OperationStatisticsDto> queue = new AsynchronousStatLogger<OperationDto, OperationStatisticsDto>(
+		new SimpleAggregatirWriter(), new OperationStatisticsDtoFactory());
+
+	queue.startLogger();
+
+	for (int i = 0; i < 100; i++) {
+	    new Thread(new ProducerThreadLog(queue), "ProducerThreadLog " + i).start();
 	}
 
-
-	public void start() throws InterruptedException, IOException {
-
-		AsynchronousStatLogger<OperationDto, OperationStatisticsDto> queue = new AsynchronousStatLogger<OperationDto, OperationStatisticsDto>
-		( new SimpleAggregatirWriter(),new OperationStatisticsDtoFactory());
-
-		queue.startLogger();
-
-		for (int i = 0; i < 100; i++) {
-			  new Thread(new ProducerThreadLog(queue), "ProducerThreadLog "+i).start();
-		 }
-
-	}
-
-
-
-
-
+    }
 
 }

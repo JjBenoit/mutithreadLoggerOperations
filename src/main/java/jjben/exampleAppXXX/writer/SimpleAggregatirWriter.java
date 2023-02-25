@@ -7,19 +7,18 @@ import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
 import jjben.exampleAppXXX.dto.OperationDto;
 import jjben.exampleAppXXX.dto.OperationStatisticsDto;
 
-public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto,OperationStatisticsDto>
-{
+public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto, OperationStatisticsDto> {
 
-	public void write(Map<String,OperationStatisticsDto> infos) {
+    public void write(Map<String, OperationStatisticsDto> infos) {
 
-		System.out.println("New Periode");
+	System.out.println("New Periode");
 
-		for (StatisticsDto<OperationDto,OperationStatisticsDto> operationDto : infos.values()) {
+	for (StatisticsDto<OperationDto, OperationStatisticsDto> operationDto : infos.values()) {
 
-				System.out.println(operationDto.print());
-
-			}
+	    System.out.println(operationDto.print());
 
 	}
+
+    }
 
 }

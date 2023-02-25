@@ -1,7 +1,7 @@
 package jjben.asynchstatlogger.fwk.actor;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,119 +11,109 @@ import java.util.logging.Logger;
 import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 
+public class StatAggregatorThread<D extends DataDto, S extends StatisticsDto<D, S>> implements Runnable {
 
+    private static final Logger LOGGER = Logger.getLogger(StatAggregatorThread.class.getName());
 
-public class StatAggregatorThread<D extends DataDto, S extends  StatisticsDto<D, S> > implements Runnable {
+    private List<ConsummerThread<D, S>> consummerThreads;
+    private List<Map<String, S>> aggregationLogs;
+    private AsynchronousStatEngine<D, S> engine;
 
-	private static final Logger LOGGER = Logger.getLogger(StatAggregatorThread.class.getName());
+    public StatAggregatorThread(AsynchronousStatEngine<D, S> engine) {
+	this.consummerThreads = Collections.synchronizedList(new ArrayList<>());
 
-	private List<ConsummerThread<D,S>> consummerThreads;
-	private List<Map<String,S>> aggregationLogs;
-	private AsynchronousStatEngine<D,S> engine;
+	this.engine = engine;
+    }
 
-	public StatAggregatorThread(AsynchronousStatEngine<D,S> engine) {
-		this.consummerThreads = new ArrayList<>();
-		this.engine = engine;
-	}
+    public void register(ConsummerThread<D, S> consummerThreadLog) {
+	consummerThreads.add(consummerThreadLog);
+    }
 
+    public void unregister(ConsummerThread<D, S> consummerThreadLog) {
+	consummerThreads.remove(consummerThreadLog);
+    }
 
+    public void receiveStats(Map<String, S> stats) {
+	aggregationLogs.add(stats);
+    }
 
-	public synchronized void register(ConsummerThread<D,S> consummerThreadLog) {
-		consummerThreads.add(consummerThreadLog);
-	}
+    @Override
+    public void run() {
 
-	public synchronized void unregister(ConsummerThread<D,S> consummerThreadLog) {
-		consummerThreads.remove(consummerThreadLog);
-	}
+	while (!Thread.currentThread().isInterrupted()) {
 
-	public synchronized void receiveStats(Map<String,S> stats) {
-		aggregationLogs.add(stats);
-	}
+	    waitForNextPeriod();
 
+	    LOGGER.log(Level.FINEST, "Begining to flush and write aggregating datas");
+	    LOGGER.log(Level.FINEST, "Notify consummers threads : claim theirs datas");
+	    notifyAnwWaitNewLogs();
+	    LOGGER.log(Level.FINEST, "Datas from consummers threads received");
 
-	@Override
-	public void run() {
+	    Map<String, S> logsConsolided = consolidationLogs();
+	    LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
 
-				
-		while (!Thread.currentThread().isInterrupted()) {
-		
-		waitForNextPeriod();
-
-		LOGGER.log(Level.FINEST, "Begining to flush and write aggregating datas");
-
-		LOGGER.log(Level.FINEST, "Notify consummers threads : claim theirs datas");
-		notifyAnwWaitNewLogs();
-
-		LOGGER.log(Level.FINEST, "Datas from consummers threads received");
-		Map<String,S> logsConsolided =  consolidationLogs();
-
-		LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
-
-		engine.getAggregatorWriter().write(logsConsolided);
-
-
-		}
+	    engine.getAggregatorWriter().write(logsConsolided);
+	    LOGGER.log(Level.FINEST, "Datas have been written");
 
 	}
 
-	private Map<String,S> consolidationLogs()
-	{
-		Map<String,S> logsConsolided = new HashMap<>();
+    }
 
-		for (Map<String,S> logsPart : aggregationLogs) {
-
-
-			//merge all the same logs ( same operation name ) sended by consummer threads
-			for (String key : logsPart.keySet()) {
-
-				S log = logsConsolided.get(key);
-
-				if(log !=null)
-				{
-					log.mergeStats(logsPart.get(key));
-				}
-				else
-				{
-					log=logsPart.get(key);
-				}
-
-				logsConsolided.put(key, log);
-			}
-		}
-		return logsConsolided;
+    // a future scheduled task can also do the job
+    private void waitForNextPeriod() {
+	try {
+	    Thread.sleep(1000 * engine.getConfig().getAggragationPeriodictyInSeconds());
+	} catch (InterruptedException e) {
+	    // Do nothing
 	}
+    }
 
-	private void notifyAnwWaitNewLogs()
-	{
-		aggregationLogs = new ArrayList<>();
+    private void notifyAnwWaitNewLogs() {
 
+	// init a new list for collecting data from consumers threads
+	aggregationLogs = Collections.synchronizedList(new ArrayList<>());
 
-		for (ConsummerThread<D,S> thread : consummerThreads) {
-			thread.ask4NewLogs();
-		}
+	// forbid new consumer thread to be inserted in the list . get the datas on
+	// the consumers threads registered
+	synchronized (consummerThreads) {
 
-		long start = System.currentTimeMillis();
-		long end = start + 60 * 1000;
-		
-		// wait untill all responses have been receçved , or time out 
-		while(aggregationLogs.size() < consummerThreads.size() && System.currentTimeMillis() < end )
-		{
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				//Do nothing
-			}
-		}
-	}
+	    for (ConsummerThread<D, S> thread : consummerThreads) {
+		thread.ask4NewLogs();
+	    }
 
-	private void waitForNextPeriod()
-	{
+	    long timeout = System.currentTimeMillis() + 60 * 1000;
+
+	    // wait until all responses have been received, or time out
+	    while (aggregationLogs.size() < consummerThreads.size() && System.currentTimeMillis() < timeout) {
 		try {
-			Thread.sleep(1000* engine.getConfig().getAggragationPeriodictyInSeconds());
+		    Thread.sleep(100);
 		} catch (InterruptedException e) {
-			//Do nothing
+		    // Do nothing
 		}
+	    }
 	}
+    }
 
+    private Map<String, S> consolidationLogs() {
+	Map<String, S> logsConsolided = new HashMap<>();
 
+	for (Map<String, S> logsPart : aggregationLogs) {
+
+	    // merge all the same logs ( same operation name ) sent by consumer
+	    // threads
+	    for (String key : logsPart.keySet()) {
+
+		S log = logsConsolided.get(key);
+
+		if (log != null) {
+		    log.mergeStats(logsPart.get(key));
+		} else {
+		    log = logsPart.get(key);
+		}
+
+		logsConsolided.put(key, log);
+	    }
+	}
+	return logsConsolided;
+    }
 }

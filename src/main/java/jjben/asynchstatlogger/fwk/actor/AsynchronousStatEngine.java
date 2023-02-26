@@ -21,7 +21,7 @@ public class AsynchronousStatEngine<D extends DataDto> {
 
     private StatAggregatorThread<D> statAggregator;
 
-    private AggregatorWriter<D> aggregatorWriter;
+    private AggregatorWriter aggregatorWriter;
 
     private StatisticsDtoFactory<D> factory;
 
@@ -34,7 +34,7 @@ public class AsynchronousStatEngine<D extends DataDto> {
 	NOT_INILIAZIED, RUNNING, STOPPED,
     }
 
-    public AsynchronousStatEngine(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
+    public AsynchronousStatEngine(AggregatorWriter aggregatorWriter, StatisticsDtoFactory<D> factory) {
 
 	this.config = new Configuration("configuration.properties");
 	this.aggregatorWriter = aggregatorWriter;
@@ -109,7 +109,7 @@ public class AsynchronousStatEngine<D extends DataDto> {
 	return statAggregator;
     }
 
-    public AggregatorWriter<D> getAggregatorWriter() {
+    public AggregatorWriter getAggregatorWriter() {
 	return aggregatorWriter;
     }
 

@@ -54,7 +54,7 @@ public class StatAggregatorThread<D extends DataDto> implements Runnable {
 
 	    LOGGER.log(Level.FINEST, "Datas consolidation done, datas will be written and flush");
 
-	    engine.getAggregatorWriter().write(aggregationLogsOld);
+	    engine.getAggregatorWriter().write(aggregationLogsOld.values());
 
 	}
 

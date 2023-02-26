@@ -11,7 +11,7 @@ public class AsynchronousStatLogger<D extends DataDto> {
 
     private final AsynchronousStatEngine<D> asynchronousStatEngine;
 
-    public AsynchronousStatLogger(AggregatorWriter<D> aggregatorWriter, StatisticsDtoFactory<D> factory) {
+    public AsynchronousStatLogger(AggregatorWriter aggregatorWriter, StatisticsDtoFactory<D> factory) {
 
 	asynchronousStatEngine = new AsynchronousStatEngine<D>(aggregatorWriter, factory);
     }

@@ -1,23 +1,23 @@
 package jjben.exampleAppXXX.writer;
 
-import java.util.Map;
+import java.util.Collection;
 
+import jjben.asynchstatlogger.fwk.dto.DataDto;
 import jjben.asynchstatlogger.fwk.dto.StatisticsDto;
 import jjben.asynchstatlogger.fwk.writer.AggregatorWriter;
-import jjben.exampleAppXXX.dto.OperationDto;
 
-public class SimpleAggregatirWriter implements AggregatorWriter<OperationDto> {
+public class SimpleAggregatirWriter implements AggregatorWriter {
+
     @Override
-    public void write(Map<String, StatisticsDto<OperationDto>> infos) {
+    public <D extends DataDto> void write(Collection<StatisticsDto<D>> collection) {
 
 	System.out.println("New Periode");
 
-	for (StatisticsDto<OperationDto> operationDto : infos.values()) {
+	for (StatisticsDto<D> operationDto : collection) {
 
 	    System.out.println(operationDto.print());
 
 	}
-
     }
 
 }
